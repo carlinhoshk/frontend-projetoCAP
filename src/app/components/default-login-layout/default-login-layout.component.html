@@ -1,20 +1,20 @@
 <main>
   <section class="form-section">
-    <img src="assets/svg/logo_f.svg" />
+    <img src="assets/svg/logo.svg" />
     <h2>{{ title }}</h2>
     <ng-content></ng-content>
     <div class="btn-wrapper">
-        <button class="btn-primary">{{ primaryBtnText }}</button>
+        <button class="btn-primary" (click)="submit()" [disabled]="disabledPrimaryBtn">{{ primaryBtnText }}</button>
         <div class="divider">
             <div></div>
             <span>ou</span>
             <div></div>
         </div>
-        <button class="btn-secondary">{{ secondaryBtnText }}</button>
+        <button class="btn-secondary" (click)="navigate()">{{ secondaryBtnText }}</button>
     </div>
   </section>
   <section class="main-section">
     <h1>You sould movet</h1>
-    <img src="/assets/svg/logo_b.svg" />
+    <img src="/assets/svg/main-logo.svg" />
   </section>
 </main>
