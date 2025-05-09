@@ -1,0 +1,44 @@
+.card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+
+  h2 {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+}
+
+.table {
+  th {
+    vertical-align: middle;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+.input-group-sm {
+  max-width: 200px;
+}
+
+.form-check {
+  margin: 0;
+}
+
+.btn-outline-primary {
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .input-group-sm {
+    max-width: 150px;
+  }
+} 

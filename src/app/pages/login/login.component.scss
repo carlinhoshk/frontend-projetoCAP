@@ -13,3 +13,22 @@ form{
         text-align: end;
     }
 }
+
+.forgot-password {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -5px;
+    margin-bottom: 20px;
+    
+    a {
+        font-size: 14px;
+        color: #666;
+        text-decoration: none;
+        transition: all 0.2s;
+        
+        &:hover {
+            color: #9440ff;
+            text-decoration: underline;
+        }
+    }
+}

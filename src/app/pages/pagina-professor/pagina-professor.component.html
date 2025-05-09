@@ -1,0 +1,70 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h2>Atribuição de Pontos</h2>
+      <div *ngIf="professor">
+        Professor: {{ professor.nome }} - {{ professor.disciplina }}
+      </div>
+    </div>
+
+    <div class="card-body">
+      <form [formGroup]="form">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Data do Registro</label>
+            <input type="date" class="form-control" formControlName="dataRegistro">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Observação Geral</label>
+            <textarea class="form-control" formControlName="observacaoGeral" rows="2"></textarea>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input" 
+                           [checked]="alunosSelecionados.size === alunos.length"
+                           (change)="selecionarTodos()">
+                    <label class="form-check-label">Selecionar Todos</label>
+                  </div>
+                </th>
+                <th>Nome</th>
+                <th>Matrícula</th>
+                <th *ngFor="let tipo of tiposPonto">{{ tipo }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let aluno of alunos">
+                <td>
+                  <div class="form-check">
+                    <input type="checkbox" class="form-check-input"
+                           [checked]="alunosSelecionados.has(aluno.id)"
+                           (change)="toggleSelecaoAluno(aluno.id)">
+                  </div>
+                </td>
+                <td>{{ aluno.nome }}</td>
+                <td>{{ aluno.matricula }}</td>
+                <td *ngFor="let tipo of tiposPonto">
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control" min="0"
+                           [id]="'pontos-' + aluno.id + '-' + tipo"
+                           #pontosInput>
+                    <button class="btn btn-outline-primary"
+                            (click)="salvarPontos(tipo, +pontosInput.value)"
+                            [disabled]="!alunosSelecionados.has(aluno.id)">
+                      Atribuir
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 
