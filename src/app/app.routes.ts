@@ -1,19 +1,50 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-import { PaginaProfessorComponent } from './pages/pagina-professor/pagina-professor.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     {
-        path: "login",
-        component: LoginComponent
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full'
+    },
+    {
+        path: 'login',
+        loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
     },
     {
         path: 'professor',
-        component: PaginaProfessorComponent
+        canActivate: [AuthGuard],
+        data: { userType: 'PROFESSOR' },
+        children: [
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            },
+            {
+                path: 'dashboard',
+                loadComponent: () => import('./pages/professor/dashboard/dashboard.component').then(m => m.DashboardComponent)
+            }
+        ]
     },
     {
-        path: '',
-        redirectTo: '/login',
-        pathMatch: 'full'
+        path: 'aluno',
+        canActivate: [AuthGuard],
+        data: { userType: 'ALUNO' },
+        children: [
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            },
+            {
+                path: 'dashboard',
+                loadComponent: () => import('./pages/aluno/dashboard/dashboard.component').then(m => m.DashboardComponent)
+            }
+        ]
+    },
+    {
+        path: '**',
+        redirectTo: 'login'
     }
 ];

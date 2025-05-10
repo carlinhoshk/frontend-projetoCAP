@@ -40,10 +40,32 @@ export class LoginComponent {
   }
 
   submit(){
-    this.loginService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe({
-      next: () => this.toastService.success("Login feito com sucesso!"),
-      error: () => this.toastService.error("Erro inesperado! Tente novamente mais tarde")
-    })
+    if (this.loginForm.valid) {
+      this.loginService.login(
+        this.loginForm.value.email!,
+        this.loginForm.value.password!
+      ).subscribe({
+        next: () => {
+          this.toastService.success("Login realizado com sucesso!");
+        },
+        error: (error) => {
+          console.error('Erro no login:', error);
+          this.toastService.error(error.message || "Erro ao fazer login. Verifique suas credenciais.");
+        }
+      });
+    } else {
+      if (this.loginForm.get('email')?.errors?.['required']) {
+        this.toastService.error("Por favor, informe seu email.");
+      } else if (this.loginForm.get('email')?.errors?.['email']) {
+        this.toastService.error("Por favor, informe um email válido.");
+      } else if (this.loginForm.get('password')?.errors?.['required']) {
+        this.toastService.error("Por favor, informe sua senha.");
+      } else if (this.loginForm.get('password')?.errors?.['minlength']) {
+        this.toastService.error("A senha deve ter pelo menos 6 caracteres.");
+      } else {
+        this.toastService.error("Por favor, preencha todos os campos corretamente.");
+      }
+    }
   }
 
   navigate(){
