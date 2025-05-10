@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { LoginService } from '../services/login.service';
 
 @Injectable({
@@ -12,21 +12,18 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean {
-    if (!this.loginService.isAuthenticated()) {
+    const currentUser = this.loginService.getCurrentUser();
+    
+    if (!currentUser) {
       this.router.navigate(['/login']);
       return false;
     }
 
-    const requiredUserType = route.data['userType'];
-    if (requiredUserType) {
-      if (requiredUserType === 'PROFESSOR' && !this.loginService.isProfessor()) {
-        this.router.navigate(['/aluno/dashboard']);
-        return false;
-      }
-      if (requiredUserType === 'ALUNO' && !this.loginService.isAluno()) {
-        this.router.navigate(['/professor/dashboard']);
-        return false;
-      }
+    // Verificar se a rota requer uma role específica
+    const requiredRole = route.data['role'];
+    if (requiredRole && !currentUser.roles.includes(requiredRole)) {
+      this.router.navigate(['/unauthorized']);
+      return false;
     }
 
     return true;

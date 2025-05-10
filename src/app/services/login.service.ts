@@ -1,20 +1,34 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LoginResponse } from '../types/login-response.type';
-import { tap, catchError, throwError, map } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, throwError, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+
+interface AuthResponse {
+  token: string;
+  email: string;
+  roles: string[];
+  nome: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
   private apiUrl = `${environment.apiUrl}/api/auth`;
+  private currentUserSubject = new BehaviorSubject<AuthResponse | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private httpClient: HttpClient,
     private router: Router
-  ) { }
+  ) {
+    // Recuperar usuário do localStorage ao iniciar
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      this.currentUserSubject.next(JSON.parse(savedUser));
+    }
+  }
 
   private decodeToken(token: string): any {
     try {
@@ -30,7 +44,7 @@ export class LoginService {
     }
   }
 
-  login(email: string, password: string) {
+  login(email: string, password: string): Observable<AuthResponse> {
     // Limpa qualquer token antigo antes de tentar um novo login
     this.logout();
 
@@ -46,40 +60,49 @@ export class LoginService {
       { headers }
     ).pipe(
       map(response => {
+        console.log('Resposta do servidor:', response);
+        
         if (!response || !response.token) {
           throw new Error('Resposta inválida do servidor');
         }
 
+        // Decodifica o token para obter as informações do usuário
         const decodedToken = this.decodeToken(response.token);
+        console.log('Token decodificado:', decodedToken);
+        
         if (!decodedToken) {
           throw new Error('Token inválido');
         }
 
-        // Extrai as informações do token
-        const userType = decodedToken.roles?.[0]?.toUpperCase() || 'ALUNO';
-        const userEmail = decodedToken.sub;
+        // Extrai as roles do token
+        const roles = decodedToken.roles || [];
+        if (!Array.isArray(roles)) {
+          throw new Error('Formato de roles inválido no token');
+        }
 
-        return {
+        // Cria o objeto de resposta com as informações do token
+        const authResponse: AuthResponse = {
           token: response.token,
-          userType: userType,
-          email: userEmail
-        } as LoginResponse;
+          email: decodedToken.sub || email,
+          roles: roles,
+          nome: decodedToken.nome || ''
+        };
+
+        console.log('AuthResponse criado:', authResponse);
+        return authResponse;
       }),
-      tap((response) => {
-        console.log('Resposta processada:', response);
-        
-        // Salva os dados do usuário
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('userType', response.userType);
-        localStorage.setItem('userEmail', response.email);
+      tap(authResponse => {
+        // Salvar no localStorage
+        localStorage.setItem('currentUser', JSON.stringify(authResponse));
+        this.currentUserSubject.next(authResponse);
         
         // Redireciona baseado no tipo de usuário
-        if (response.userType === 'PROFESSOR') {
+        if (authResponse.roles.includes('ROLE_PROFESSOR')) {
           this.router.navigate(['/professor/dashboard']);
-        } else if (response.userType === 'ALUNO') {
+        } else if (authResponse.roles.includes('ROLE_ALUNO')) {
           this.router.navigate(['/aluno/dashboard']);
         } else {
-          // Caso o tipo de usuário não seja reconhecido
+          console.error('Roles não reconhecidas:', authResponse.roles);
           this.logout();
           throw new Error('Tipo de usuário não reconhecido');
         }
@@ -107,31 +130,28 @@ export class LoginService {
   }
 
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userType');
-    localStorage.removeItem('userEmail');
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
-  getUserType(): string | null {
-    return localStorage.getItem('userType');
-  }
-
   isProfessor(): boolean {
-    return this.getUserType() === 'PROFESSOR';
+    return this.currentUserSubject.value?.roles.includes('ROLE_PROFESSOR') ?? false;
   }
 
   isAluno(): boolean {
-    return this.getUserType() === 'ALUNO';
+    return this.currentUserSubject.value?.roles.includes('ROLE_ALUNO') ?? false;
   }
 
-  // Método para verificar se o usuário está autenticado
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return !!this.currentUserSubject.value;
   }
 
-  // Método para obter o token
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return this.currentUserSubject.value?.token ?? null;
+  }
+
+  getCurrentUser(): AuthResponse | null {
+    return this.currentUserSubject.value;
   }
 }

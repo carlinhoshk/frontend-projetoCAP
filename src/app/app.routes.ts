@@ -14,7 +14,7 @@ export const routes: Routes = [
     {
         path: 'professor',
         canActivate: [AuthGuard],
-        data: { userType: 'PROFESSOR' },
+        data: { role: 'ROLE_PROFESSOR' },
         children: [
             {
                 path: '',
@@ -23,14 +23,14 @@ export const routes: Routes = [
             },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./pages/professor/dashboard/dashboard.component').then(m => m.DashboardComponent)
+                loadComponent: () => import('./components/professor-dashboard/professor-dashboard.component').then(m => m.ProfessorDashboardComponent)
             }
         ]
     },
     {
         path: 'aluno',
         canActivate: [AuthGuard],
-        data: { userType: 'ALUNO' },
+        data: { role: 'ROLE_ALUNO' },
         children: [
             {
                 path: '',
@@ -39,7 +39,7 @@ export const routes: Routes = [
             },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./pages/aluno/dashboard/dashboard.component').then(m => m.DashboardComponent)
+                loadComponent: () => import('./components/aluno-dashboard/aluno-dashboard.component').then(m => m.AlunoDashboardComponent)
             }
         ]
     },

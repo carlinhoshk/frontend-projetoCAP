@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { LoginService } from '../../services/login.service';
 
 @Component({
   selector: 'app-aluno-dashboard',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './aluno-dashboard.component.html',
   styleUrls: ['./aluno-dashboard.component.css']
 })
