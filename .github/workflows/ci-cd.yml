@@ -1,0 +1,93 @@
+name: Frontend CI/CD Pipeline
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [ main, branch-dev ]
+  pull_request:
+    branches: [ main, branch-dev ]
+
+env:
+  DOCKER_IMAGE: carlinhoshk/frontend-projetocap
+  DOCKER_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    environment: Dockerhub-cred
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run linting
+        run: npm run lint || true
+        
+      - name: Build project
+        run: npm run build --prod
+        
+      - name: Run tests
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+        
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          target_commitish: main
+          name: Release ${{ github.run_number }}
+          body: |
+            - Release automática gerada pelo CI.
+            - Commit: ${{ github.sha }}
+            - Veja o changelog para detalhes.
+          draft: false
+          prerelease: false
+          files: dist/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} -t ${{ env.DOCKER_IMAGE }}:latest .
+
+      - name: Run Docker container for testing
+        run: |
+          docker run -d --name frontend-test -p 4200:4200 ${{ env.DOCKER_IMAGE }}:latest
+          
+      - name: Wait for services to be ready
+        run: |
+          sleep 30
+          docker ps
+          
+      - name: Run e2e tests
+        run: npm run e2e -- --configuration=ci
+        
+      - name: Stop and remove Docker container
+        if: always()
+        run: |
+          docker stop frontend-test || true
+          docker rm frontend-test || true
+          
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          docker push ${{ env.DOCKER_IMAGE }}:latest 
