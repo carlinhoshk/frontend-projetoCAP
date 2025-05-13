@@ -3,10 +3,15 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --configuration development",
+    "dev": "NODE_OPTIONS=--max-old-space-size=4096 ESBUILD_BINARY_PATH=node_modules/esbuild/bin/esbuild ng serve",
+    "dev:win": "set NODE_OPTIONS=--max-old-space-size=4096 && set ESBUILD_BINARY_PATH=node_modules/esbuild/bin/esbuild && ng serve",
     "build": "ng build",
+    "e2e": "ng e2e",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "private": true,
   "dependencies": {
@@ -19,6 +24,7 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "ngx-toastr": "^19.0.0",
+    "playwright-ng-schematics": "^0.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
@@ -27,13 +33,18 @@
     "@angular-devkit/build-angular": "^18.2.7",
     "@angular/cli": "^18.2.7",
     "@angular/compiler-cli": "^18.2.0",
+    "@cypress/schematic": "^3.0.0",
     "@types/jasmine": "~5.1.0",
+    "cypress": "^14.3.3",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.5.2"
+    "protractor": "^7.0.0",
+    "start-server-and-test": "^2.0.11",
+    "typescript": "~5.5.2",
+    "wait-on": "^8.0.3"
   }
 }
