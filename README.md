@@ -21,7 +21,7 @@ Este é o frontend do Projeto CAP, uma aplicação web desenvolvida em Angular 1
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/frontend-projetoCAP.git
+git clone https://github.com/carlinhoshk/frontend-projetoCAP.git
 cd frontend-projetoCAP
 ```
 
