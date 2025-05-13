@@ -19,8 +19,6 @@ jobs:
     environment: Dockerhub-cred
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -43,42 +41,22 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-files
           path: dist/
 
-      - name: Set Release Variables
-        id: release_vars
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "target_branch=${{ github.base_ref }}" >> $GITHUB_OUTPUT
-          else
-            echo "target_branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create Git tag
-        if: github.event_name != 'pull_request'
-        run: |
-          git tag v${{ github.run_number }}
-          git push origin v${{ github.run_number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub Release
-        if: github.event_name != 'pull_request'
+      - name: Criar Release no GitHub
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
-          target_commitish: ${{ steps.release_vars.outputs.target_branch }}
+          target_commitish: main
           name: Release ${{ github.run_number }}
           body: |
             - Release automática gerada pelo CI.
             - Commit: ${{ github.sha }}
-            - Branch: ${{ steps.release_vars.outputs.target_branch }}
             - Veja o changelog para detalhes.
           draft: false
           prerelease: false
-          files: |
-            dist/**/*
+          files: dist/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -110,7 +88,6 @@ jobs:
           docker rm frontend-test || true
           
       - name: Push Docker image
-        if: github.event_name != 'pull_request'
         run: |
           docker push ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
           docker push ${{ env.DOCKER_IMAGE }}:latest 
