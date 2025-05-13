@@ -1,4 +1,5 @@
 export type LoginResponse = {
-    token: string,
-    name: string
+    token: string;
+    userType: 'PROFESSOR' | 'ALUNO';
+    email: string;
 }
