@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [ main, branch-dev ]
+    branches: [ master, main, branch-dev ]
   pull_request:
-    branches: [ main, branch-dev ]
+    branches: [ master, main, branch-dev ]
 
 env:
   DOCKER_IMAGE: carlinhoshk/frontend-projetocap
