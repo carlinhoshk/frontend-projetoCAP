@@ -1,20 +1,18 @@
 # Frontend Projeto CAP
 
-Este é o frontend do Projeto CAP, uma aplicação web desenvolvida em Angular 18 que fornece uma interface moderna e responsiva para interação com o sistema.
+Este é o frontend do Projeto CAP, uma aplicação web desenvolvida em Angular 16 que fornece uma interface moderna e responsiva para interação com o sistema.
 
 ## 🚀 Tecnologias Utilizadas
 
-- Angular 18.2.0
-- Node.js 18
-- Docker
+- Angular 16.2.0
+- Node.js 20
 - NGX-Toastr para notificações
 - RxJS para programação reativa
 
 ## 📋 Pré-requisitos
 
-- Node.js 18 ou superior
+- Node.js 20 ou superior
 - NPM (Node Package Manager)
-- Docker (opcional, para containerização)
 - Git
 
 ## 🔧 Instalação
@@ -27,7 +25,7 @@ cd frontend-projetoCAP
 
 2. Instale as dependências:
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
 3. Inicie o servidor de desenvolvimento:
@@ -45,17 +43,26 @@ A aplicação estará disponível em `http://localhost:4200`
 - `npm run watch` - Compila o projeto em modo de observação
 - `npm run e2e` - Executa os testes end-to-end
 
-## 🐳 Docker
+## 📦 Executando a Versão de Produção
 
-### Construir a imagem
+Para executar a versão compilada da aplicação (pasta dist):
+
+1. Construa a aplicação:
 ```bash
-docker build -t frontend-projetocap .
+npm run build
 ```
 
-### Executar o container
+2. Instale o pacote `serve` globalmente:
 ```bash
-docker run -d -p 4200:4200 frontend-projetocap
+npm install -g serve
 ```
+
+3. Execute a aplicação compilada:
+```bash
+serve -s dist/login-page -l 4200
+```
+
+A aplicação estará disponível em `http://localhost:4200`
 
 ## 🔄 CI/CD
 
@@ -63,16 +70,13 @@ O projeto utiliza GitHub Actions para CI/CD com os seguintes estágios:
 
 1. Build e testes
 2. Criação de release no GitHub
-3. Construção e push da imagem Docker
-4. Testes de integração
-5. Deploy automático
+3. Publicação de artefatos
 
 ### Configuração do CI/CD
 
 Para utilizar o CI/CD, configure os seguintes secrets no GitHub:
 
-- `DOCKERHUB_USERNAME`: Seu usuário do Docker Hub
-- `DOCKERHUB_TOKEN`: Token de acesso do Docker Hub
+- `GITHUB_TOKEN`: Token de acesso do GitHub (automaticamente configurado)
 
 ## 📦 Estrutura do Projeto
 
@@ -99,8 +103,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## ✨ Autor
 Carlinhoshk
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
 ---
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Para obter mais ajuda sobre o Angular CLI, use `ng help` ou consulte a página [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli).

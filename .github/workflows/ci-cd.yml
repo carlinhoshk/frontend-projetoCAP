@@ -41,13 +41,13 @@ jobs:
           
       - name: List dist directory
         run: ls -la dist/
-
+        
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist-files
           path: dist/login-page/
-          
+
       - name: Criar Release no GitHub
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2
