@@ -39,11 +39,14 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
           ESBUILD_BINARY_PATH: node_modules/esbuild/bin/esbuild
           
+      - name: List dist directory
+        run: ls -la dist/
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist-files
-          path: dist/login-page/browser/
+          path: dist/login-page/
           
       - name: Criar Release no GitHub
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -57,6 +60,6 @@ jobs:
             - Data: ${{ github.event.head_commit.timestamp }}
           draft: false
           prerelease: false
-          files: dist/login-page/browser/**/*
+          files: dist/login-page/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
