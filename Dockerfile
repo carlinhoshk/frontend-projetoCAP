@@ -1,34 +1,27 @@
-# Estágio de build
-FROM node:18-alpine as builder
+# Imagem única - build e execução
+FROM node:20-alpine
 WORKDIR /app
 
 # Configurações para evitar problemas com esbuild
 ENV NODE_OPTIONS=--max-old-space-size=4096
 ENV ESBUILD_BINARY_PATH=/app/node_modules/esbuild/bin/esbuild
+ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
 
-# Instalar dependências primeiro (layer de cache)
+# Instalar dependências
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps --no-fund --loglevel=error
 
-# Copiar e construir o projeto
+# Copiar arquivos do projeto
 COPY . .
+
+# Construir a aplicação em modo produção
 RUN npm run build -- --configuration=production
 
-# Estágio de produção
-FROM nginx:alpine
-# Copiar os arquivos compilados para o diretório do servidor nginx
-COPY --from=builder /app/dist/login-page/browser/ /usr/share/nginx/html/
+# Instalar servidor http simples globalmente
+RUN npm install -g serve
 
-# Configurar Nginx para usar a porta 4200
-RUN echo 'server {\n\
-    listen 4200;\n\
-    server_name localhost;\n\
-    root /usr/share/nginx/html;\n\
-    index index.html index.htm;\n\
-    location / {\n\
-        try_files $uri $uri/ /index.html;\n\
-    }\n\
-}' > /etc/nginx/conf.d/default.conf
-
+# Expor porta 4200
 EXPOSE 4200
-CMD ["nginx", "-g", "daemon off;"] 
+
+# Comando para iniciar o servidor na porta 4200
+CMD ["serve", "-s", "dist/login-page/browser", "-l", "4200"] 
