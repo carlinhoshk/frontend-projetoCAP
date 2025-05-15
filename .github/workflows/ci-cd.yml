@@ -44,27 +44,6 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
           ESBUILD_BINARY_PATH: node_modules/esbuild/bin/esbuild
         
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-files
-          path: dist/login-page/browser/
-
-      - name: Criar Release no GitHub
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ github.run_number }}
-          target_commitish: main
-          name: Release ${{ github.run_number }}
-          body: |
-            - Release automática gerada pelo CI.
-            - Commit: ${{ github.sha }}
-            - Veja o changelog para detalhes.
-          draft: false
-          prerelease: false
-          files: dist/login-page/browser/**/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
