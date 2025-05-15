@@ -9,14 +9,9 @@ on:
   pull_request:
     branches: [ master, main, branch-dev ]
 
-env:
-  DOCKER_IMAGE: carlinhoshk/frontend-projetocap
-  DOCKER_TAG: ${{ github.sha }}
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    environment: Dockerhub-cred
     steps:
       - uses: actions/checkout@v3
       
@@ -49,39 +44,19 @@ jobs:
         with:
           name: dist-files
           path: dist/login-page/browser/
-
-  build-and-publish-docker:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    environment: Dockerhub-cred
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-files
-          path: dist/login-page/browser/
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }},${{ env.DOCKER_IMAGE }}:latest
-          cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:latest
-          cache-to: type=inline
           
-      - name: Verificação básica da imagem
-        run: |
-          docker pull ${{ env.DOCKER_IMAGE }}:latest
-          docker image inspect ${{ env.DOCKER_IMAGE }}:latest 
+      - name: Criar Release no GitHub
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          body: |
+            - Release automática gerada pelo CI.
+            - Commit: ${{ github.sha }}
+            - Data: ${{ github.event.head_commit.timestamp }}
+          draft: false
+          prerelease: false
+          files: dist/login-page/browser/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
