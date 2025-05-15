@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './default-login-layout.component.html',
-  styleUrl: './default-login-layout.component.scss'
+  styleUrls: ['./default-login-layout.component.scss']
 })
 export class DefaultLoginLayoutComponent {
   @Input() title: string = '';

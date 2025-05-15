@@ -17,7 +17,7 @@ type InputTypes = "text" | "email" | "password"
     }
   ],
   templateUrl: './primary-input.component.html',
-  styleUrl: './primary-input.component.scss'
+  styleUrls: ['./primary-input.component.scss']
 })
 export class PrimaryInputComponent implements ControlValueAccessor {
   @Input() type: InputTypes = "text";

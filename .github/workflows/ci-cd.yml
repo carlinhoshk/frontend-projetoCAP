@@ -39,7 +39,7 @@ jobs:
           ESBUILD_BINARY_PATH: node_modules/esbuild/bin/esbuild
         
       - name: Build project
-        run: npm run build 
+        run: npm run build -- --configuration=production
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           ESBUILD_BINARY_PATH: node_modules/esbuild/bin/esbuild
