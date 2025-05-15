@@ -8,11 +8,11 @@ ENV ESBUILD_BINARY_PATH=/app/node_modules/esbuild/bin/esbuild
 
 # Instalar dependências primeiro (layer de cache)
 COPY package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Copiar e construir o projeto
 COPY . .
-RUN npm run build --prod
+RUN npm run build -- --configuration=production
 
 # Estágio de produção
 FROM nginx:alpine
