@@ -13,10 +13,10 @@ export class AlunoService {
   constructor(private http: HttpClient) {}
 
   getAlunos(): Observable<Aluno[]> {
-    return this.http.get<Aluno[]>(`${this.apiUrl}/alunos`);
+    return this.http.get<Aluno[]>(`${this.apiUrl}/api/alunos`);
   }
 
   salvarPontos(pontos: PontosFormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/pontos`, pontos);
+    return this.http.post(`${this.apiUrl}/api/pontos`, pontos);
   }
 } 

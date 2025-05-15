@@ -8,14 +8,30 @@
   </header>
 
   <main class="dashboard-content">
-    <section class="dashboard-section">
-      <h2>Minhas Turmas</h2>
-      <!-- Aqui você pode adicionar a lista de turmas do professor -->
-    </section>
+    <div class="dashboard-cards">
+      <section class="dashboard-card" (click)="navegarParaTurmas()">
+        <div class="card-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h2>Minhas Turmas</h2>
+        <p>Gerenciar suas turmas e alunos</p>
+      </section>
 
-    <section class="dashboard-section">
-      <h2>Atividades Recentes</h2>
-      <!-- Aqui você pode adicionar as atividades recentes -->
-    </section>
+      <section class="dashboard-card" (click)="navegarParaAtribuicaoNotas()">
+        <div class="card-icon">
+          <i class="fas fa-clipboard-check"></i>
+        </div>
+        <h2>Atribuição de Notas</h2>
+        <p>Atribuir notas e presença aos alunos</p>
+      </section>
+
+      <section class="dashboard-card" (click)="navegarParaAtividadesRecentes()">
+        <div class="card-icon">
+          <i class="fas fa-history"></i>
+        </div>
+        <h2>Atividades Recentes</h2>
+        <p>Ver suas atividades recentes no sistema</p>
+      </section>
+    </div>
   </main>
 </div> 

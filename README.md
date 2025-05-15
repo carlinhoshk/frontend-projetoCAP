@@ -18,17 +18,20 @@ Este é o frontend do Projeto CAP, uma aplicação web desenvolvida em Angular 1
 ## 🔧 Instalação
 
 1. Clone o repositório:
+
 ```bash
 git clone https://github.com/carlinhoshk/frontend-projetoCAP.git
 cd frontend-projetoCAP
 ```
 
 2. Instale as dependências:
+
 ```bash
 npm install --legacy-peer-deps
 ```
 
 3. Inicie o servidor de desenvolvimento:
+
 ```bash
 npm start
 ```
@@ -48,19 +51,22 @@ A aplicação estará disponível em `http://localhost:4200`
 Para executar a versão compilada da aplicação (pasta dist):
 
 1. Construa a aplicação:
+
 ```bash
 npm run build
 ```
 
 2. Instale o pacote `serve` globalmente:
-```bash
+
+````bash
 npm install -g serve
-```
+ng build```
 
 3. Execute a aplicação compilada:
+
 ```bash
 serve -s dist/login-page -l 4200
-```
+````
 
 A aplicação estará disponível em `http://localhost:4200`
 
@@ -102,6 +108,7 @@ frontend-projetoCAP/
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## ✨ Autor
+
 Carlinhoshk
 
 ---

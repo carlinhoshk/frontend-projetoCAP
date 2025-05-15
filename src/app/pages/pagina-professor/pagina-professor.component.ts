@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray, FormControl } from '@angular/forms';
 import { AlunoService } from '../../services/aluno.service';
 import { ProfessorService } from '../../services/professor.service';
 import { Aluno, Professor, TipoPonto, PontosFormData, AlunoPontos, Pontuacao } from '../../types/pontuacao.types';
@@ -14,10 +14,14 @@ import { Aluno, Professor, TipoPonto, PontosFormData, AlunoPontos, Pontuacao } f
 })
 export class PaginaProfessorComponent implements OnInit {
   form: FormGroup;
+  notasForm: FormGroup;
   alunos: Aluno[] = [];
   professor: Professor | null = null;
   tiposPonto = Object.values(TipoPonto);
   alunosSelecionados: Set<number> = new Set();
+  salvandoNotas = false;
+  mensagemSucesso = '';
+  mensagemErro = '';
   
   constructor(
     private fb: FormBuilder,
@@ -26,7 +30,11 @@ export class PaginaProfessorComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       observacaoGeral: ['', Validators.required],
-      dataRegistro: [new Date(), Validators.required]
+      dataRegistro: [new Date().toISOString().split('T')[0], Validators.required]
+    });
+
+    this.notasForm = this.fb.group({
+      alunos: this.fb.array([])
     });
   }
 
@@ -43,53 +51,124 @@ export class PaginaProfessorComponent implements OnInit {
     );
 
     this.alunoService.getAlunos().subscribe(
-      alunos => this.alunos = alunos
+      alunos => {
+        this.alunos = alunos;
+        this.inicializarFormulariosAlunos();
+      }
     );
   }
 
-  toggleSelecaoAluno(alunoId: number) {
-    if (this.alunosSelecionados.has(alunoId)) {
-      this.alunosSelecionados.delete(alunoId);
-    } else {
-      this.alunosSelecionados.add(alunoId);
-    }
+  get alunosFormArray(): FormArray {
+    return this.notasForm.get('alunos') as FormArray;
+  }
+
+  inicializarFormulariosAlunos() {
+    this.alunos.forEach(aluno => {
+      const alunoGroup = this.fb.group({
+        alunoId: [aluno.id],
+        nome: [aluno.nome],
+        matricula: [aluno.matricula],
+        selecionado: [false],
+        pontuacoes: this.fb.group({})
+      });
+      
+      this.tiposPonto.forEach(tipo => {
+        (alunoGroup.get('pontuacoes') as FormGroup).addControl(
+          tipo, 
+          new FormControl(0, [Validators.min(0), Validators.max(10)])
+        );
+      });
+      
+      this.alunosFormArray.push(alunoGroup);
+    });
+  }
+
+  toggleSelecaoAluno(index: number) {
+    const controle = this.alunosFormArray.at(index).get('selecionado');
+    controle?.setValue(!controle.value);
   }
 
   selecionarTodos() {
-    if (this.alunosSelecionados.size === this.alunos.length) {
-      this.alunosSelecionados.clear();
-    } else {
-      this.alunosSelecionados = new Set(this.alunos.map(a => a.id));
-    }
+    const todos = this.alunosFormArray.controls.every(control => control.get('selecionado')?.value);
+    this.alunosFormArray.controls.forEach(control => {
+      control.get('selecionado')?.setValue(!todos);
+    });
   }
 
-  salvarPontos(tipo: TipoPonto, pontos: number) {
-    if (!this.professor) return;
+  estaoTodosSelecionados(): boolean {
+    return this.alunosFormArray.controls.every(control => control.get('selecionado')?.value);
+  }
 
-    const alunosPontos: AlunoPontos[] = Array.from(this.alunosSelecionados).map(alunoId => ({
-      alunoId,
-      pontuacoes: [{
-        tipo,
-        pontos
-      }]
-    }));
+  salvarNotas() {
+    if (!this.professor || !this.form.valid) return;
+    
+    this.mensagemSucesso = '';
+    this.mensagemErro = '';
+    this.salvandoNotas = true;
+
+    const alunosSelecionados = this.alunosFormArray.controls
+      .filter(control => control.get('selecionado')?.value)
+      .map(control => {
+        const alunoId = control.get('alunoId')?.value;
+        const pontuacoesForm = control.get('pontuacoes') as FormGroup;
+        
+        const pontuacoes: Pontuacao[] = Object.keys(pontuacoesForm.controls)
+          .map(tipo => ({
+            tipo: tipo as TipoPonto,
+            pontos: pontuacoesForm.get(tipo)?.value || 0
+          }))
+          .filter(p => p.pontos > 0);
+        
+        return {
+          alunoId,
+          pontuacoes
+        } as AlunoPontos;
+      })
+      .filter(ap => ap.pontuacoes.length > 0);
+
+    if (alunosSelecionados.length === 0) {
+      this.mensagemErro = 'Selecione pelo menos um aluno e atribua pelo menos uma nota.';
+      this.salvandoNotas = false;
+      return;
+    }
 
     const dados: PontosFormData = {
       professorId: this.professor.id,
-      alunosPontos,
+      alunosPontos: alunosSelecionados,
       observacaoGeral: this.form.get('observacaoGeral')?.value || '',
-      dataRegistro: this.form.get('dataRegistro')?.value
+      dataRegistro: new Date(this.form.get('dataRegistro')?.value)
     };
 
     this.alunoService.salvarPontos(dados).subscribe(
       response => {
-        console.log('Pontos salvos com sucesso', response);
-        // TODO: Adicionar feedback visual de sucesso
+        console.log('Notas salvas com sucesso', response);
+        this.mensagemSucesso = 'Notas atribuídas com sucesso!';
+        this.salvandoNotas = false;
+        
+        // Limpar as notas dos alunos selecionados
+        this.alunosFormArray.controls
+          .filter(control => control.get('selecionado')?.value)
+          .forEach(control => {
+            const pontuacoesForm = control.get('pontuacoes') as FormGroup;
+            Object.keys(pontuacoesForm.controls).forEach(tipo => {
+              pontuacoesForm.get(tipo)?.setValue(0);
+            });
+          });
       },
       error => {
-        console.error('Erro ao salvar pontos', error);
-        // TODO: Adicionar feedback visual de erro
+        console.error('Erro ao salvar notas', error);
+        this.mensagemErro = 'Erro ao salvar as notas. Por favor, tente novamente.';
+        this.salvandoNotas = false;
       }
     );
+  }
+
+  atribuirNotaParaTodos(tipo: TipoPonto, valor: number) {
+    this.alunosFormArray.controls
+      .filter(control => control.get('selecionado')?.value)
+      .forEach(control => {
+        const pontuacoesForm = control.get('pontuacoes') as FormGroup;
+        pontuacoesForm.get(tipo)?.setValue(valor);
+      });
   }
 } 

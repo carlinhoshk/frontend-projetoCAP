@@ -1,13 +1,23 @@
 <div class="container mt-4">
   <div class="card">
-    <div class="card-header">
-      <h2>Atribuição de Pontos</h2>
+    <div class="card-header bg-primary text-white">
+      <h2>Atribuição de Notas</h2>
       <div *ngIf="professor">
         Professor: {{ professor.nome }} - {{ professor.disciplina }}
       </div>
     </div>
 
     <div class="card-body">
+      <div *ngIf="mensagemSucesso" class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ mensagemSucesso }}
+        <button type="button" class="btn-close" (click)="mensagemSucesso = ''"></button>
+      </div>
+
+      <div *ngIf="mensagemErro" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ mensagemErro }}
+        <button type="button" class="btn-close" (click)="mensagemErro = ''"></button>
+      </div>
+
       <form [formGroup]="form">
         <div class="row mb-3">
           <div class="col-md-6">
@@ -19,17 +29,45 @@
             <textarea class="form-control" formControlName="observacaoGeral" rows="2"></textarea>
           </div>
         </div>
+      </form>
 
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h4>Notas para Todos os Alunos Selecionados</h4>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div *ngFor="let tipo of tiposPonto" class="col-md-4 mb-2">
+                    <div class="input-group">
+                      <span class="input-group-text">{{ tipo }}</span>
+                      <input type="number" min="0" max="10" class="form-control" #valorGlobal>
+                      <button class="btn btn-outline-primary" 
+                              (click)="atribuirNotaParaTodos(tipo, +valorGlobal.value)">
+                        Aplicar a Selecionados
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="notasForm">
+        <div formArrayName="alunos" class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-dark">
               <tr>
                 <th>
                   <div class="form-check">
                     <input type="checkbox" class="form-check-input" 
-                           [checked]="alunosSelecionados.size === alunos.length"
+                           [checked]="estaoTodosSelecionados()"
                            (change)="selecionarTodos()">
-                    <label class="form-check-label">Selecionar Todos</label>
+                    <label class="form-check-label">Todos</label>
                   </div>
                 </th>
                 <th>Nome</th>
@@ -38,33 +76,32 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let aluno of alunos">
+              <tr *ngFor="let alunoForm of alunosFormArray.controls; let i = index" [formGroupName]="i">
                 <td>
                   <div class="form-check">
-                    <input type="checkbox" class="form-check-input"
-                           [checked]="alunosSelecionados.has(aluno.id)"
-                           (change)="toggleSelecaoAluno(aluno.id)">
+                    <input type="checkbox" class="form-check-input" formControlName="selecionado">
                   </div>
                 </td>
-                <td>{{ aluno.nome }}</td>
-                <td>{{ aluno.matricula }}</td>
-                <td *ngFor="let tipo of tiposPonto">
-                  <div class="input-group input-group-sm">
-                    <input type="number" class="form-control" min="0"
-                           [id]="'pontos-' + aluno.id + '-' + tipo"
-                           #pontosInput>
-                    <button class="btn btn-outline-primary"
-                            (click)="salvarPontos(tipo, +pontosInput.value)"
-                            [disabled]="!alunosSelecionados.has(aluno.id)">
-                      Atribuir
-                    </button>
-                  </div>
+                <td>{{ alunoForm.get('nome')?.value }}</td>
+                <td>{{ alunoForm.get('matricula')?.value }}</td>
+                <td *ngFor="let tipo of tiposPonto" formGroupName="pontuacoes">
+                  <input type="number" class="form-control form-control-sm" 
+                         [formControlName]="tipo" min="0" max="10">
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </form>
+
+      <div class="d-grid gap-2 col-6 mx-auto mt-4">
+        <button class="btn btn-primary" 
+                (click)="salvarNotas()" 
+                [disabled]="salvandoNotas || !form.valid">
+          <span *ngIf="!salvandoNotas">Salvar Notas</span>
+          <span *ngIf="salvandoNotas">Salvando...</span>
+        </button>
+      </div>
     </div>
   </div>
 </div> 

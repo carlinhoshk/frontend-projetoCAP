@@ -17,14 +17,20 @@ main {
         width: 100%;
         max-width: 1200px;
         height: 100%;
-        padding: 20px;
+        padding: 24px;
+        
+        @media (min-width: 768px) {
+            padding: 32px;
+        }
         
         @media (min-width: 992px) {
             flex-direction: row;
-            height: 80%;
+            height: 85%;
             background-color: white;
             border-radius: 24px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 24px;
         }
     }
 
@@ -33,17 +39,21 @@ main {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        padding: 16px;
+        
+        @media (min-width: 768px) {
+            padding: 24px;
+        }
     }
 
     .main-section {
-        display: none; // Oculta em telas pequenas
+        display: none;
         
-        @media (min-width: 992px) {
+        @media (min-width: 768px) {
             display: flex;
             width: 50%;
             height: 100%;
-            padding: 40px;
+            padding: 32px;
             
             img {
                 max-width: 100%;
@@ -52,11 +62,21 @@ main {
                 border-radius: 16px;
             }
         }
+
+        @media (min-width: 992px) {
+            padding: 40px;
+        }
     }
 
     .form-section {
         width: 100%;
         max-width: 480px;
+        padding-bottom: 32px;
+        
+        @media (min-width: 768px) {
+            max-width: 560px;
+            padding-bottom: 40px;
+        }
         
         @media (min-width: 992px) {
             width: 50%;
@@ -64,16 +84,26 @@ main {
         }
 
         img {
-            width: 120px;
-            margin-bottom: 30px;
+            width: 100px;
+            margin-bottom: 24px;
+            
+            @media (min-width: 768px) {
+                width: 120px;
+                margin-bottom: 30px;
+            }
         }
 
         h2 {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 36px;
+            margin-bottom: 24px;
             color: $primary-color;
             text-align: center;
+            
+            @media (min-width: 768px) {
+                font-size: 24px;
+                margin-bottom: 36px;
+            }
         }
 
         .btn-wrapper {
@@ -82,17 +112,28 @@ main {
             align-items: center;
             justify-content: center;
             width: 100%;
-            gap: 24px;
-            margin-top: 20px;
+            gap: 16px;
+            margin-top: 16px;
+            margin-bottom: 16px;
+            
+            @media (min-width: 768px) {
+                gap: 24px;
+                margin-top: 20px;
+                margin-bottom: 24px;
+            }
 
             .divider {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 16px;
+                gap: 12px;
                 width: 100%;
+                
+                @media (min-width: 768px) {
+                    gap: 16px;
+                }
 
-                font-size: 14px;
+                font-size: 12px;
                 color: #888;
                 font-weight: 400;
                 text-transform: uppercase;
@@ -100,7 +141,7 @@ main {
                 div {
                     flex-grow: 1;
                     height: 1px;
-                    background-color: #ddd;
+                    background-color: #e0e0e0;
                 }
             }
 
