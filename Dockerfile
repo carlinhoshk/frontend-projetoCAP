@@ -1,27 +1,15 @@
-# Imagem única - build e execução
-FROM node:20-alpine
+# Build da aplicação Angular
+FROM node:20-alpine AS build
 WORKDIR /app
-
-# Configurações para evitar problemas com esbuild
-ENV NODE_OPTIONS=--max-old-space-size=4096
-ENV ESBUILD_BINARY_PATH=/app/node_modules/esbuild/bin/esbuild
-ENV NPM_CONFIG_LEGACY_PEER_DEPS=true
-
-# Instalar dependências
 COPY package*.json ./
 RUN npm install --legacy-peer-deps --no-fund --loglevel=error
-
-# Copiar arquivos do projeto
 COPY . .
-
-# Construir a aplicação em modo produção
 RUN npm run build -- --configuration=production
 
-# Instalar servidor http simples globalmente
-RUN npm install -g serve
-
-# Expor porta 4200
+# Imagem final com NGINX
+FROM nginx:alpine
+WORKDIR /usr/share/nginx/html
+COPY --from=build /app/dist/login-page .
+COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 4200
-
-# Comando para iniciar o servidor na porta 4200
-CMD ["serve", "-s", "dist/login-page/browser", "-l", "4200"] 
+CMD ["nginx", "-g", "daemon off;"]
