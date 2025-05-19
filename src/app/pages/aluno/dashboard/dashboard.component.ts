@@ -44,12 +44,15 @@ import { LoginService } from '../../../services/login.service';
 })
 export class DashboardComponent {
   userEmail: string | null;
+  userId: number | null;
 
   constructor(private loginService: LoginService) {
-    this.userEmail = localStorage.getItem('userEmail');
+    const currentUser = this.loginService.getCurrentUser();
+    this.userEmail = currentUser?.email || null;
+    this.userId = currentUser?.id || null;
   }
 
   logout() {
     this.loginService.logout();
   }
-} 
+}

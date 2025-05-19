@@ -27,17 +27,14 @@ export class ProfessorDashboardComponent implements OnInit {
   }
 
   navegarParaTurmas(): void {
-    // Navegação para a página de turmas - atualize conforme a rota real
     this.router.navigate(['/professor/turmas']);
   }
 
   navegarParaAtribuicaoNotas(): void {
-    // Navegação para a página de atribuição de notas
     this.router.navigate(['/pagina-professor']);
   }
 
   navegarParaAtividadesRecentes(): void {
-    // Navegação para a página de atividades recentes - atualize conforme a rota real
     this.router.navigate(['/professor/atividades']);
   }
 } 

@@ -11,14 +11,17 @@ import { LoginService } from '../../services/login.service';
 })
 export class AlunoDashboardComponent implements OnInit {
   alunoEmail: string | null = null;
+  alunoId: number | null = null;
 
   constructor(private loginService: LoginService) { }
 
   ngOnInit(): void {
-    this.alunoEmail = localStorage.getItem('userEmail');
+    const currentUser = this.loginService.getCurrentUser();
+    this.alunoEmail = currentUser?.email || null;
+    this.alunoId = currentUser?.id || null;
   }
 
   logout(): void {
     this.loginService.logout();
   }
-} 
+}
