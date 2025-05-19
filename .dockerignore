@@ -1,9 +1,0 @@
-node_modules
-.git
-.gitignore
-Dockerfile
-README.md
-*.log
-*.env
-dist
-coverage
