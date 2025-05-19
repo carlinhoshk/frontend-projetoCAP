@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap, catchError, throwError, map } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -9,6 +9,7 @@ interface AuthResponse {
   email: string;
   roles: string[];
   nome: string;
+  id: number; // Novo campo para armazenar o id retornado pelo backend
 }
 
 @Injectable({
@@ -54,48 +55,18 @@ export class LoginService {
 
     console.log('Enviando requisição de login para:', `${this.apiUrl}/login`);
 
-    return this.httpClient.post<{token: string}>(
+    return this.httpClient.post<AuthResponse>(
       `${this.apiUrl}/login`, 
       { email, password },
       { headers }
     ).pipe(
-      map(response => {
-        console.log('Resposta do servidor:', response);
-        
-        if (!response || !response.token) {
+      tap(authResponse => {
+        if (!authResponse || !authResponse.token) {
           throw new Error('Resposta inválida do servidor');
         }
-
-        // Decodifica o token para obter as informações do usuário
-        const decodedToken = this.decodeToken(response.token);
-        console.log('Token decodificado:', decodedToken);
-        
-        if (!decodedToken) {
-          throw new Error('Token inválido');
-        }
-
-        // Extrai as roles do token
-        const roles = decodedToken.roles || [];
-        if (!Array.isArray(roles)) {
-          throw new Error('Formato de roles inválido no token');
-        }
-
-        // Cria o objeto de resposta com as informações do token
-        const authResponse: AuthResponse = {
-          token: response.token,
-          email: decodedToken.sub || email,
-          roles: roles,
-          nome: decodedToken.nome || ''
-        };
-
-        console.log('AuthResponse criado:', authResponse);
-        return authResponse;
-      }),
-      tap(authResponse => {
         // Salvar no localStorage
         localStorage.setItem('currentUser', JSON.stringify(authResponse));
         this.currentUserSubject.next(authResponse);
-        
         // Redireciona baseado no tipo de usuário
         if (authResponse.roles.includes('ROLE_PROFESSOR')) {
           this.router.navigate(['/professor/dashboard']);
@@ -109,21 +80,16 @@ export class LoginService {
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Erro completo:', error);
-        
         let errorMessage = 'Erro ao fazer login. ';
-        
         if (error.status === 401) {
           errorMessage += 'Email ou senha inválidos.';
         } else if (error.status === 0) {
           errorMessage += 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.';
         } else if (error.error instanceof ErrorEvent) {
-          // Erro do cliente
           errorMessage += `Erro: ${error.error.message}`;
         } else {
-          // Erro do servidor
           errorMessage += `Erro ${error.status}: ${error.error?.message || 'Ocorreu um erro inesperado'}`;
         }
-        
         return throwError(() => new Error(errorMessage));
       })
     );

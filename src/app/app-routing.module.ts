@@ -13,31 +13,31 @@ const routes: Routes = [
     path: 'professor/dashboard',
     component: ProfessorDashboardComponent,
     canActivate: [AuthGuard],
-    data: { userType: 'PROFESSOR' }
+    data: { role: 'ROLE_PROFESSOR' }
   },
   {
     path: 'pagina-professor',
     component: PaginaProfessorComponent,
     canActivate: [AuthGuard],
-    data: { userType: 'PROFESSOR' }
+    data: { role: 'ROLE_PROFESSOR' }
   },
   {
     path: 'professor/turmas',
     component: PaginaProfessorComponent, // Temporariamente usando o mesmo componente
     canActivate: [AuthGuard],
-    data: { userType: 'PROFESSOR' }
+    data: { role: 'ROLE_PROFESSOR' }
   },
   {
     path: 'professor/atividades',
     component: PaginaProfessorComponent, // Temporariamente usando o mesmo componente
     canActivate: [AuthGuard],
-    data: { userType: 'PROFESSOR' }
+    data: { role: 'ROLE_PROFESSOR' }
   },
   {
     path: 'aluno/dashboard',
     component: AlunoDashboardComponent,
     canActivate: [AuthGuard],
-    data: { userType: 'ALUNO' }
+    data: { role: 'ROLE_ALUNO' }
   },
   { path: '**', redirectTo: '/login' }
 ];
