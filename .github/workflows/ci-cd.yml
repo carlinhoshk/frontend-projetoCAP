@@ -9,44 +9,57 @@ on:
   pull_request:
     branches: [ master, main, branch-dev ]
 
+env:
+  DOCKER_IMAGE: carlinhoshk/escola-frontend
+  DOCKER_TAG: ${{ github.sha }}
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    environment: Dockerhub-cred
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-        
+
       - name: Run linting
         run: npm run lint || true
-        
+
       - name: Executar testes unitários simples
         run: npm test -- --watch=false --browsers=ChromeHeadless --karma-config=karma.conf.ci.js || true
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           ESBUILD_BINARY_PATH: node_modules/esbuild/bin/esbuild
-        
+
       - name: Build project
         run: npm run build -- --configuration=production
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           ESBUILD_BINARY_PATH: node_modules/esbuild/bin/esbuild
-          
+
       - name: List dist directory
         run: ls -la dist/
-        
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          name: dist-files
-          path: dist/login-page/
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} -t ${{ env.DOCKER_IMAGE }}:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          docker push ${{ env.DOCKER_IMAGE }}:latest
 
       - name: Criar Release no GitHub
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
