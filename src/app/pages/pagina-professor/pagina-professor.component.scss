@@ -1,25 +1,68 @@
+.container {
+  max-width: 1200px;
+}
+
 .card {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  
   h2 {
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    font-weight: 600;
   }
 }
 
 .table {
-  th {
-    vertical-align: middle;
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
+  
+  input[type="number"] {
+    text-align: center;
+    
+    &::-webkit-inner-spin-button, 
+    &::-webkit-outer-spin-button { 
+      opacity: 1;
+    }
+  }
+}
 
-  td {
-    vertical-align: middle;
+.form-control-sm {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
   }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.table-responsive {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.alert {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .input-group-sm {

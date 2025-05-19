@@ -13,6 +13,6 @@ export class ProfessorService {
   constructor(private http: HttpClient) {}
 
   getProfessor(id: number): Observable<Professor> {
-    return this.http.get<Professor>(`${this.apiUrl}/professores/${id}`);
+    return this.http.get<Professor>(`${this.apiUrl}/api/professores/${id}`);
   }
 } 
