@@ -10,7 +10,6 @@ COPY karma.conf.ci.js ./
 COPY karma.conf.js ./
 COPY src ./src
 COPY public ./public
-COPY styles ./styles
 RUN npm install --legacy-peer-deps --no-fund --loglevel=error
 RUN npm run build -- --configuration=production
 
