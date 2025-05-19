@@ -2,8 +2,15 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
+COPY angular.json ./
+COPY tsconfig.json ./
+COPY tsconfig.app.json ./
+COPY tsconfig.spec.json ./
+COPY karma.conf.ci.js ./
+COPY karma.conf.js ./
+COPY src ./src
+COPY styles ./styles
 RUN npm install --legacy-peer-deps --no-fund --loglevel=error
-COPY . .
 RUN npm run build -- --configuration=production
 
 # Imagem final com NGINX

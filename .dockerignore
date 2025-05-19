@@ -3,7 +3,6 @@ node_modules
 .gitignore
 Dockerfile
 README.md
-src
 *.log
 *.env
 dist
