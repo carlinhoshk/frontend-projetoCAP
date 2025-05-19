@@ -16,7 +16,7 @@ RUN npm run build -- --configuration=production
 # Imagem final com NGINX
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
-COPY --from=build /app/dist/frontend-projetoCAP .
+COPY --from=build /app/dist/login-page .
 COPY nginx.conf /etc/nginx/nginx.conf
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
